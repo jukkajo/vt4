@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xhtml>
+<html lang="fi" xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi">
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='ty_s3.css') }}"/>
+        <meta charset="utf-8" />
+        <title>{{ kilpailu }} / sarjat</title>
+    </head>
+    <body>
+    <h1 class="s3_h1">{{ kilpailu }}</h1>
+    <div class="s3_valikko">
+    <ul>
+        <!-- tähän olisi hyväv rakentaa muokkaus-sivun(s4.xhtml) kaltainen v-lyönti tarkistin -->
+        {% set u = request.base_url %}
+        {% set lis_pituus = vuosi|length + 1 %}
+        {% set pituus = u|length - (kilpailu|length + 1) - lis_pituus%}
+        <li><a href="{{ u[:pituus] }}" >Takaisin </a></li>
+        {% if nimet|length > 1 %}
+            {% for ind in nimet: %}
+                <li><a href="{{request.base_url}}/{{ind}}" >{{ ind }}</a></li>
+            {% endfor %}
+        {% else %}
+            <li>Kilpailussa ei sarjoja :( valitse toinen kilpailu</li>
+        {% endif %}
+    </ul>
+    </div>
+<!-- Tästä eteenpäin on vain apuvälineenä käytettäviä skriptejä -->
+<!-- HTMLinspectoria käytetään sivun live-muutosten validointiin. Kannattaa
+vielä varmuuden vuoksi ajaa välillä myös W3C:n validaattori -->
+<script src="https://appro.mit.jyu.fi/tools/htmlinspector/html-inspector.js"></script>
+<!-- Sivun validoinnin W3C:n validaattorilla voit tehdä milloin tahansa näppäinyhdistelmällä CTRL+ALT+V -->
+<script src="https://appro.mit.jyu.fi/tools/validator/validator.user.js"></script>
+<script src="https://appro.mit.jyu.fi/tools/validator/xml-validator.js"></script>
+</body>
+</html>

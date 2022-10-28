@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xhtml>
+<html lang="fi" xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi">
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='ty_s2.css') }}"/>
+        <meta charset="utf-8" />
+        <title>Kilpailut</title>
+    </head>
+    <body id="s2_body">
+        <h2 class="s2_h2">Kirjaudu ulos</h2>
+        <a href="/logout"><img id="s2_logout" src="/static/logout.png" alt="Ulos kirjautuminen"/></a> 
+        <header>Valikko:</header>
+    	<div class="s2_valikko">
+	    <ul>
+                <li id="s2_info" title="Tietorakenteessa joukkueilla oli avain 'sarja', joka oli kokonaisluku, tälle ainoa looginen vastinpari vaikutti olevan indeksi sarjojen taulukossa. Tiedä sitten tulkitsinko väärin.">Tuopas hiiren cursori tähän ja pidä hetki</li>
+                {% for ind in knimet: %}
+                <li><a href="{{request.base_url}}/{{ ind['kisanimi'] }}_{{ind['alkuaika'].year}}">{{ ind["kisanimi"] }} {{ ind["alkuaika"].year }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        
+        <h2>Kilpailut:</h2>
+
+        {% for ind2 in knimet: %}
+        {% set sailo = [] %}
+
+        <ul>
+            <li class="s2_vari">{{ind2["kisanimi"]}} {{ind2["alkuaika"].date()}}</li>
+            <ul>
+                {% for ind3 in snimet: %}
+                    {% if ind3["kilpailu"] == ind2["id"]: %}
+                        <li>{{ ind3["sarjanimi"] }}</li>
+                        <ul>
+                            {% for ind4 in joukkueet: %}
+                            {% set sailo2 = [] %}
+                            {% set t_vai_f = true %}
+                            
+                                {% if ind4["sarja"] == ind3["id"]: %}
+                                    {% if (ind4["nimi"]) not in sailo: %}
+
+                                            {% if vastuu_henk == ind4["vastuu_henk"]: %}
+                                                <li class="s2_vari"><a href="/muokkaus_{{ind4['nimi']}}">{{ind4["nimi"]}}</a>
+                                            {% else %}
+                                                {% set t_vai_f = false %}    
+                                                <li class="s2_vari">{{ind4["nimi"]}}
+                                            {% endif %}
+  
+                                            <ul>
+                                            {% for ind6 in ind4["jasenet"]: %}
+                                                {% if ind6 not in sailo2: %}
+                                                    {% if ind6 is not none: %}
+                                                        <li class="s2_vari2">{{ind6}}</li>
+                                                    {% endif %}
+                                                {{ sailo2.append(ind5)|default("", True) }}
+                                                {% endif %}
+                                            {% endfor %}
+                                            </ul>
+                                        </li>
+                                        
+                                        {{ sailo.append(ind4["nimi"])|default("", True) }}
+                                    {% endif %}
+                                {% endif %}
+
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        </ul>
+        {% endfor %}
+<!-- Tästä eteenpäin on vain apuvälineenä käytettäviä skriptejä -->
+<!-- HTMLinspectoria käytetään sivun live-muutosten validointiin. Kannattaa
+vielä varmuuden vuoksi ajaa välillä myös W3C:n validaattori -->
+<script src="https://appro.mit.jyu.fi/tools/htmlinspector/html-inspector.js"></script>
+<!-- Sivun validoinnin W3C:n validaattorilla voit tehdä milloin tahansa näppäinyhdistelmällä CTRL+ALT+V -->
+<script src="https://appro.mit.jyu.fi/tools/validator/validator.user.js"></script>
+<script src="https://appro.mit.jyu.fi/tools/validator/xml-validator.js"></script>
+</body>
+</html>

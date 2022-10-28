@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css?family=Germania One:300,400,400i,500');
+body {
+   background-color: RGB(213, 165, 115);
+   color: RGB(5, 124, 138);
+   font-family: 'Germania One', sans-serif;
+   z-index: 1;
+}
+
+.s5_h1 {
+    color: #8E0C0A;
+    z-index: 2;
+    margin-left: 0.5em;
+}
+
+.s5_h1_2 {
+    color: #8E0C0A;
+    z-index: 2;
+    margin-left: 0.5em;
+    font-size: 1.4em;
+}
+
+.s5_valikko {
+  border: 2px solid #8E0C0A;
+  transition: all .5s ease; 
+  width: 20%;
+  height: 4.3em;
+  margin-left: 0.1em;
+  background-color: rgb(206, 146, 86);
+}
+
+.s5_valikko ul, .s4_valikko li {
+  list-style-type: none;
+  height: 2.5em;
+}
+
+.s5_valikko ul a{
+  display: block;
+  height: 100%;
+  width: 100%;
+  line-height: 1.5em;
+  font-size: 1.5em;
+  color: green;
+  padding-left: 0em;
+  box-sizing: border-box;
+  transition: .4s;
+}
+
+ul li:hover a{
+  padding-left: 4em;
+  color: red;
+  background-color: RGB(213, 165, 115);
+}
+
+label {
+  padding-right: 0.5em;
+}
+
+fieldset {
+    color: RGB(5, 124, 138);
+    width: 25%;
+    border: 2px solid RGB(5, 124, 138);
+}
+
+fieldset:hover {
+    border: 2px solid red;
+}
+
+#s5_vari {
+    color: green;
+}

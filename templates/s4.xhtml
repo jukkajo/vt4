@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xhtml>
+<html lang="fi" xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi">
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='ty_s4.css') }}"/>
+        <meta charset="utf-8" />
+        <title>{{ v_kilpailu }} {{vuosi}} / {{ sarja }}</title>
+    </head>
+    <body>
+    <h1 class="s4_h1">{{ v_kilpailu }} {{vuosi}} / {{ sarja }}</h1>
+    <div class="s4_valikko">
+    <ul>
+        {% set u = request.base_url %}
+        {% set tmp = (1 + 3 * esiintymat) %}
+        <!-- Selain muuntaa välilyönnin ->%20, joten esiintymien perusteella lasketaan edellisen sivun-urlin pituus-->
+        {% set pituus = u|length - (sarja|length - esiintymat + tmp) %}
+        <li><a href="{{ u[:pituus] }}" >Takaisin </a></li>
+    </ul>
+    </div>
+    <h1 class="s4_h1_2">Lisää joukkue kilpailuun {{ v_kilpailu }}, sarjaan {{ sarja }}</h1>
+    <form action="{{request.base_url}}" method="POST">
+    {{ form.csrf_token }}
+    <fieldset>
+        <p>{{form.nimi.label}}{{ form.nimi }}</p><span>{% for error in form.nimi.errors %} {{ error|e }} {% endfor %}{{viestic}}</span>
+        <p>{{form.j1.label}}{{ form.j1 }}</p><span>{% for error in form.j1.errors %} <p>{{ error|e }}</p> {% endfor %}</span>
+        <p>{{form.j2.label}}{{ form.j2 }}</p><span>{% for error in form.j2.errors %} <p>{{ error|e }}</p> {% endfor %}</span>
+        <p>{{form.j3.label}}{{ form.j3 }}</p><span>{% for error in form.j3.errors %} <p>{{ error|e }}</p> {% endfor %}</span>
+        <p>{{form.j4.label}}{{ form.j4 }}</p><span>{% for error in form.j4.errors %} <p>{{ error|e }}</p> {% endfor %}</span>
+        <p>{{form.j5.label}}{{ form.j5 }}</p><span>{% for error in form.j5.errors %} <p>{{ error|e }}</p> {% endfor %}</span>
+        <p><input type="submit" name="tallenna" value="Tallenna" id="s4_input"/></p>
+    </fieldset>
+    </form>
+    <p id="s4_vari">{{lisays_status}}</p>
+<!-- Tästä eteenpäin on vain apuvälineenä käytettäviä skriptejä -->
+<!-- HTMLinspectoria käytetään sivun live-muutosten validointiin. Kannattaa
+vielä varmuuden vuoksi ajaa välillä myös W3C:n validaattori -->
+<script src="https://appro.mit.jyu.fi/tools/htmlinspector/html-inspector.js"></script>
+<!-- Sivun validoinnin W3C:n validaattorilla voit tehdä milloin tahansa näppäinyhdistelmällä CTRL+ALT+V -->
+<script src="https://appro.mit.jyu.fi/tools/validator/validator.user.js"></script>
+<script src="https://appro.mit.jyu.fi/tools/validator/xml-validator.js"></script>
+</body>
+</html>

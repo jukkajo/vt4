@@ -1,0 +1,1 @@
+$env:GOOGLE_APPLICATION_CREDENTIALS="/home/jukka/google-cloud-sdk/building-an-app/ties4080-vt4-364219-530a4cbf2d7a.json"

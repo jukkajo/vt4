@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xhtml>
+<html lang="fi" xmlns="http://www.w3.org/1999/xhtml" xml:lang="fi">
+    <head>
+        <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='ty_s1.css') }}"/>
+        <meta charset="utf-8" />
+        <title>Kirjaudu kilpailuun</title>
+    </head>
+    <body>
+    {% if k %}
+    	<h3>Tila: Kirjautunut</h3>
+        <h2 class="s1_h2">Pääsivulle:</h2>
+        <div class="s1_valikko">
+            <ul>
+                <li><a class="s1_a" href="/kilpailut">Kilpailut</a></li>
+            </ul>
+        </div>
+        <h2 class="s1_h2">Kirjaudu ulos:</h2>
+        <div class="s1_valikko">
+            <ul>
+    	        <li><a class="s1_a" href="/logout">logout</a></li>
+    	    </ul>
+    	</div>
+    {% else %}
+    	<h2 class="s1_h2">Kirjaudu G-tunnuksella</h2>
+    	<div class="s1_valikko">
+    	    <ul>
+    	        <li><a class="s1_a" href="/login">login</a></li>
+    	    </ul>
+    	</div>
+    {% endif %}
+    
+<!-- Tästä eteenpäin on vain apuvälineenä käytettäviä skriptejä -->
+<!-- HTMLinspectoria käytetään sivun live-muutosten validointiin. Kannattaa
+vielä varmuuden vuoksi ajaa välillä myös W3C:n validaattori -->
+<script src="https://appro.mit.jyu.fi/tools/htmlinspector/html-inspector.js"></script>
+<!-- Sivun validoinnin W3C:n validaattorilla voit tehdä milloin tahansa näppäinyhdistelmällä CTRL+ALT+V -->
+<script src="https://appro.mit.jyu.fi/tools/validator/validator.user.js"></script>
+<script src="https://appro.mit.jyu.fi/tools/validator/xml-validator.js"></script>
+</body>
+</html>
