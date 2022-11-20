@@ -9,11 +9,12 @@
     <body>
     <div class="s5_valikko">
     <ul>
-        {% set u = request.base_url %}
-        {% set tmp = nimi|length %}
+        <!--{% set u = request.base_url %} -->
+        <!--{% set tmp = nimi|length %} -->
         <!-- Selain muuntaa välilyönnin ->%20, joten esiintymien perusteella lasketaan edellisen sivun-urlin pituus-->
-        {% set pituus = u|length - tmp - 9 %}
-        <li><a href="{{ u[:pituus] }}kilpailut" >Takaisin </a></li>
+        <!--{% set pituus = u|length - 9 - tmp%} 9 -->
+        <!--<li><a href="{{ u[:pituus] }}kilpailut" >Takaisin </a></li> -->
+        <li><a href="https://ties4080-vt4-366902.ew.r.appspot.com/kilpailut" >Takaisin </a></li> 
     </ul>
     </div>
 
@@ -23,7 +24,7 @@
     <fieldset>
         <p>{{form.poista.label}}{{ form.poista }}</p>
         <p>{{form.s_valinta.label}}{{ form.s_valinta }}</p>
-        <p>{{form.nimi.label}}{{ form.nimi }}</p><span>{% for error in form.nimi.errors %} {{ error|e }} {% endfor %}{{viestic}}</span>
+        <p>{{form.nimi.label}}{{ form.nimi }}</p><span>{% for error in form.nimi.errors %} {{ error|e }} {% endfor %}{{viesti}}</span>
         <p>{{form.j1.label}}{{ form.j1 }}</p><span>{% for error in form.j1.errors %} <p>{{ error|e }}</p> {% endfor %}</span>
         <p>{{form.j2.label}}{{ form.j2 }}</p><span>{% for error in form.j2.errors %} <p>{{ error|e }}</p> {% endfor %}</span>
         <p>{{form.j3.label}}{{ form.j3 }}</p><span>{% for error in form.j3.errors %} <p>{{ error|e }}</p> {% endfor %}</span>
@@ -33,6 +34,8 @@
     </fieldset>
     </form>
     <p id="s5_vari">{{muokkaus_status}}</p>
+    <!--<p>{{p}}</p> -->
+
 <!-- Tästä eteenpäin on vain apuvälineenä käytettäviä skriptejä -->
 <!-- HTMLinspectoria käytetään sivun live-muutosten validointiin. Kannattaa
 vielä varmuuden vuoksi ajaa välillä myös W3C:n validaattori -->

@@ -48,7 +48,7 @@ h3 {
   transition: .4s;
 }
 ul li:hover a{
-  padding-left: 4em;
+  padding-left: 0.5em
   color: red;
   background-color: RGB(213, 165, 115);
 }

@@ -1,3 +1,4 @@
+import sys
 from operator import itemgetter
 from functools import wraps
 from flask import Flask, flash, render_template, redirect, url_for, session, make_response, request, config, Response
@@ -102,6 +103,43 @@ def kilpailut():
     session['sailo'] = sailo
     """
     return Response(render_template(s2, vastuu_henk=vastuu_henk, knimet=knimet, snimet=snimet, joukkueet=joukkueet_lista), mimetype=mt)
+
+def varm(joukkue, sarja, avain):
+    cli = datastore.Client()
+    results = cli.query(kind="joukkueet").add_filter("sarja","=",sarja).fetch()
+    jt = []
+    t_or_f = False
+    for r in results:
+        jt.append(r)
+        
+    ind = 0
+    for i_nd in jt:
+        if i_nd["avain"] == avain:
+            jt.pop(ind)
+        else: 
+            ind = ind+1
+
+    for i in range(len(jt)):
+        if jt[i]["nimi"].lower().strip() == joukkue.lower().strip():
+            t_or_f = True
+    
+    return t_or_f
+    
+#pirkka versio tuosta ylemmästä funktiosta    
+def varm2(nimi, sarja):
+    cli = datastore.Client()
+    #results = cli.query(kind="joukkueet").add_filter("sarja","=",sarja).fetch()
+    results = cli.query(kind="joukkueet").fetch()
+    jt = []
+    t_or_f = False
+    for ind in results:
+        jt.append(ind)
+    
+    for ind in jt:
+        if ind["nimi"].lower().strip() == nimi.lower().strip():
+           t_or_f = True
+    
+    return t_or_f
 
 @app.route("/auth")
 def auth():
@@ -260,7 +298,7 @@ def sarja(kilpailu, sarja):
         vertailu = vertaile(sailo, 0, sarja, nimi, kilpailu)
         
         if vertailu == True:
-            return render_template(s4, form=form, viestic=viestic1, sarja=sarja, esiintymat=esiintymat, v_kilpailu=v_kilpailu, vuosi=vuosi, n=neekeri, mimetype=mt)
+            return render_template(s4, form=form, viestic=viestic1, sarja=sarja, esiintymat=esiintymat, v_kilpailu=v_kilpailu, vuosi=vuosi, mimetype=mt)
         
         else:
          
@@ -293,28 +331,36 @@ def sarja(kilpailu, sarja):
         
             jasenet = list(filter(None, tmp))
             jasenet.sort()
-        
-            try:
-                j = {"sarja": s, "nimi": nimi, "jasenet": jasenet, "kilpailu": k_id, "vastuu_henk":session.get('email_info')}
-                cl = datastore.Client()
-                tunniste_tmp = str(d.datetime.now())
-                v_avain = cl.key("joukkueet", tunniste_tmp)
-                v_entiteetti = datastore.Entity(key=v_avain)
-                v_entiteetti.update({"avain": v_avain})
-                #
-                v_entiteetti.update({"kilpailu": k_id}) 
-                #
-                v_entiteetti.update(j)
-                cl.put(v_entiteetti)
-                #return render_template(s4,form=form,viestic=viestic3, mimetype=mt)
-                lisays_status="Joukkueesi lisätty kilpailuun!"
-            except:
-                viestic=viestic3
+            varmenna = varm2(nimi,sarja)
+            duplikaatti = j_dupl()
+            
+            if duplikaatti == False and varmenna == False:
+                try:
+                    j = {"sarja": s, "nimi": nimi, "jasenet": jasenet, "kilpailu": k_id, "vastuu_henk":session.get('email_info')}
+                    cl = datastore.Client()
+                    tunniste_tmp = str(d.datetime.now())
+                    v_avain = cl.key("joukkueet", tunniste_tmp)
+                    v_entiteetti = datastore.Entity(key=v_avain)
+                    avain = str(v_avain)
+                    avain=avain[19:45]
+                    v_entiteetti.update({"avain": avain})
+                    #
+                    v_entiteetti.update({"kilpailu": str(k_id)}) 
+                    #
+                    v_entiteetti.update(j)
+                    cl.put(v_entiteetti)
+                    #return render_template(s4,form=form,viestic=viestic3, mimetype=mt)
+                    lisays_status="Joukkueesi lisätty kilpailuun!"
+                except:
+                    viestic=viestic3
+            else:
+                viestic = viestic2
             
             #lisätään ja etsitään jos duplikaatteja, jos ei, niin ei poistoa     
                     
             duplikaatti = j_dupl()
-            if duplikaatti == True:
+
+            if duplikaatti == True and varmenna == True:
                 #poisto tkannasta
                 cli = datastore.Client()
                 tmp = cli.query(kind="joukkueet").add_filter("nimi", "=", nimi).fetch()
@@ -348,25 +394,47 @@ def luo_entityt(data_olio, cli, mjono):
     	    tunniste_tmp = str(d.datetime.now())
     	    v_avain = cli.key(mjono, tunniste_tmp)
     	    v_entiteetti = datastore.Entity(key=v_avain)
-    	    v_entiteetti.update({"avain": v_avain})
-    	    
+    	    avain = str(v_avain)
+    	    avain=avain[19:45]
+    	    v_entiteetti.update({"avain": avain})
+    	
     	v_entiteetti.update(ind)
     	cli.put(v_entiteetti)
 
-#jos käyttäjä painaa lisäämänsä joukkueen linkkiä, ohjataan hänet tälle muokkaussivulle	
-@app.route('/muokkaus_<nimi>', methods=[P,G])
-@varmenna_lupa
-def muokkaus(nimi):
-    viesti = ""
-    muokkaus_status=""
+"""
+def jdel(par):
+    cli = datastore.Client()
+    avain = cli.key("joukkueet", par)
+    cli.delete(avain)
+"""
+
+def query(nimi):
     cli = datastore.Client()
     tmp = cli.query(kind="joukkueet").add_filter("nimi", "=", nimi).fetch()
     jlista = []
     for ind in tmp:
         jlista.append(ind)
+    return jlista
+
+#jos käyttäjä painaa lisäämänsä joukkueen linkkiä, ohjataan hänet tälle muokkaussivulle	
+@app.route('/muokkaus_<nimi>', methods=[P,G])
+@varmenna_lupa
+def muokkaus(nimi):
+    poista_tf=""
+    session["nimi"] = nimi
+    cli = datastore.Client()
+    viesti = ""
+    muokkaus_status=""
+    jlista = query(nimi)
+        
     joukkueDat = None
-    if jlista[0]:
+    if len(jlista) >= 1:
         joukkueDat = jlista[0]
+    else:
+        nimi = session.get("nimi")
+        jlista = query(nimi)
+        joukkueDat = jlista[0]
+        
         
     #h = str(joukkueDat["avain"])
     sarjat = cli.query(kind="sarjat")
@@ -400,10 +468,12 @@ def muokkaus(nimi):
             
     form = joukkue()
     
+    
+    avain = str(joukkueDat["avain"])
     #validointi, koska voihan olla, että vastuuhenkilö muuttanut joukkuetta hassusti
     #if request.method == P and form.validate():
     #edit tehdäänpäs validonti vasta myöhemmin
-    if request.method == P:
+    if request.method == P and form.validate():
         nimi = request.form.get("nimi")
         s_valinta = request.form.get("s_valinta")
         j1 = request.form.get("j1")
@@ -425,8 +495,8 @@ def muokkaus(nimi):
         if poista_tf == "y":
             try:
                 cli = datastore.Client()
-                #avain = cli.key("joukkueet", joukkueDat["avain"])
-                cli.delete(joukkueDat["avain"])
+                avain = cli.key("joukkueet", joukkueDat["avain"])
+                cli.delete(avain)
                 return redirect("/kilpailut")
             except:
                 #leikitään että olisi hienot ja toimivat sivut
@@ -434,16 +504,13 @@ def muokkaus(nimi):
         
         #jälleen, onko jäsenissä samannimisiä, true tai false
         jas_dupl = vertaile(vertailtavat, 0, "", "", "")
-        
+
         if jas_dupl == True:
             viesti = "Samannimiset jäsenevät eivät ole sallittuja"
-            return render_template(s5,form=form,viesti=viesti, viesti2=viesti2, nimi=nimi, mimetype=mt)
+            return render_template(s5,form=form,viesti=viesti, nimi=nimi, mimetype=mt)
         
         #==============================================================================================
-        cli = datastore.Client()
-        avain = cli.key("joukkueet", joukkueDat["avain"])
-        paivitetty = datastore.Entity(avain)
-        #{"sarja": sarjat, "nimi": nimi, "jasenet": jasenet, "vastuu_henk":session.get('email_info')}
+
         sarja=1
         i = 0
         for ind in valinnat:
@@ -452,14 +519,38 @@ def muokkaus(nimi):
                 break  
             sarja += 1
             i += 1
+        
+        #22:48
+        
+        #av = str(joukkueDat["avain"])
+        #av=av[19:45]
+        av = joukkueDat["avain"]
+        cli5 = datastore.Client()
+        avain = cli5.key("joukkueet", av)
+        with cli5.transaction():
+            t = cli5.get(avain)
+            t["nimi"] = nimi
+            t["jasenet"] = jasenet
+            t["sarja"] = sarja
+            cli5.put(t)
             
-        #paivitetty.update({"nimi":nimi, "jasenet":sailo2, "kilpailu":joukkueDat["kilpailu"], "sarja":sarja, "vastuu_henk":joukkueDat["vastuu_henk"], "avain":av_t[19:45]})
-        paivitetty.update({"nimi":nimi, "jasenet":sailo2, "kilpailu":joukkueDat["kilpailu"], "sarja":sarja, "vastuu_henk":joukkueDat["vastuu_henk"]})
-        cli.put(paivitetty)
+        #paivitetty.update({"nimi":nimi, "jasenet":jasenet, "kilpailu":joukkueDat["kilpailu"], "sarja":sarja, "vastuu_henk":joukkueDat["vastuu_henk"]})
+
+        """
+        cli = datastore.Client()
+        with cli.transaction():
+            key = client.key("Task", "sampleTask")
+            task = client.get(key)
+            task["done"] = True
+            client.put(task)
+        """   
+         
+        #==============================================================================================
         
         #onko duplikaatteja joukkueissa
-        j_dupl  = j_dupl()   
-        if j_dupl == True:
+        jo_dupl  = j_dupl()
+        varmenna = varm(nimi,joukkueDat["sarja"],joukkueDat["avain"])
+        if jo_dupl == True and varmenna == True:
             #poistetaan lisätty joukkue ja palautetaan v-ilmoitus
             cli = datastore.Client()
             avain = cli.key("joukkueet", joukkueDat["avain"])
@@ -469,9 +560,10 @@ def muokkaus(nimi):
 
         else:
             muokkaus_status="Muutokset tallennettu!"
-            #==============================================================================================
+        #==============================================================================================
+        session.pop("nimi")
     #return render_template(s6, jlista=jlista, joukkueDat=joukkueDat, muokkaus_status=muokkaus_status, sarja=sarja, h=h, mimetype=mt)
-    return render_template(s5, jlista=jlista, tmp=tmp, joukkue=joukkueDat, form=form, nimi=nimi, muokkaus_status=muokkaus_status, mimetype=mt)
+    return render_template(s5, jlista=jlista, joukkue=joukkueDat, form=form, nimi=nimi, muokkaus_status=muokkaus_status, mimetype=mt)
 	
 @app.route('/')
 def main():
